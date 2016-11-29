@@ -209,3 +209,40 @@ class DataWorkflow:
         print "Starting work on node" + node.nid
         self.process(node)
         print "Finished work on node" + node.nid
+
+def main():
+    j = DataWorkflow()
+    j.addNode("A", "ls")
+    j.addNode("B", "ls -l")
+    j.addNode("C", "ls -l", ["A", "B"])
+    j.addNode("D", "ls -l", ["C"])
+    j.addNode("E", "ls -l", ["D"])
+    j.addNode("F", "ls -l", ["D"])
+    j.addNode("G", "ls -l", ["F"])
+    j.addNode("I", "ls -l", ["E"])
+    j.addNode("H", "ls -l", ["E"])
+
+    j.addNodesToWorkQueue()
+    
+    wq = j.work_queue
+    
+    
+    wq.poll().id in ('A', 'B')
+    wq.dequeue()
+    wq.poll().id in ('A', 'B')
+    wq.dequeue()
+    wq.poll().id == 'C'
+    wq.dequeue()
+    wq.poll().id == 'D'
+    wq.dequeue()
+    wq.poll().id in ('E', 'F')
+    wq.dequeue()
+    wq.poll().id in ('E', 'F')
+    wq.dequeue()
+    wq.poll().id in ('G', 'H', 'I')
+    wq.dequeue()
+    wq.poll().id in ('G', 'H', 'I')
+    wq.dequeue()
+    wq.poll().id in ('G', 'H', 'I')
+    wq.dequeue()
+    wq.poll() == None
